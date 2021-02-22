@@ -1,0 +1,248 @@
+---
+title: "LearnR Exercises - Week 08 - Bivariate Regression"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(learnrhash)
+gradethis::gradethis_setup()
+
+library(tidyverse)
+data(df_opposition) 
+```
+
+## Getting to know your data
+
+After getting to know `R` and the `tidyverse` in previous weeks, it's now time to run our first statistical model. Before we can do so, we'll have to load the data and should get familiar with it. Luckily, the data set is already preloaded and called `df_opposition`. It is the same data we used in the lab on opposition parties in national European parliaments. Let's check it out. 
+
+**How many observations and variables does the data have?**
+
+```{r check_data_sol,echo = FALSE, eval=FALSE}
+dim(df_opposition)
+```
+
+
+```{r check_data, exercise = TRUE}
+
+```
+
+
+```{r check_data_q1, echo = FALSE}
+question_text("Enter the number of observations here:",
+  answer("54", correct = T),
+  allow_retry = T,
+  incorrect = "Hint: Try ndim() or nrow()."
+)
+
+```
+
+
+```{r check_data_q2, echo = FALSE}
+question_text("Enter the number of variables here:",
+  answer("17", correct = T),
+  allow_retry = T,
+  incorrect = "Hint: Try ndim() or ncol()."
+)
+
+```
+
+ 
+As in the lab session, we want to better understand why and how often opposition parties vote against the government. Hence, the  percentage share of votes that are opposed to the government is our dependent variable. The corresponding variable in the data set is called `conflict_p`. 
+
+**What is the median value of this variable (in percent and rounded to two meaningful (non-zero) digits (e.g., 0.23, 4.5, 13))?**
+
+
+```{r median_conflict_sol, echo = FALSE, eval=FALSE}
+median(df_opposition$conflict_p)
+```
+
+```{r median_conflict, exercise = TRUE}
+
+```
+
+
+```{r median_conflict_q, echo = FALSE}
+question("The median  of the conflict measure (in percent and rounded to two meaningful digits) is:",
+  answer("54", correct = T),
+  answer("0.5", correct = F, message = "Please report the result in percent and rounded to two digits."),
+  answer("0.54", correct = F, message = "Close but remember that you are supposed to report the median in percent."),
+  answer("0.054", correct = F, message = "Please report the result in percent and rounded to two digits."),
+  answer("50", correct = F, message = "Please report the result rounded to two meaningful (non-zero) digits."),
+  answer("53.68", correct = F, message = "Not wrong per se, but too detailed."),
+  random_answer_order = TRUE,
+  allow_retry = T
+)
+
+```
+
+
+**What is its standard deviation (in percent and rounded to two meaningful (non-zero) digits (e.g., 0.23, 4.5, 13))?**
+
+```{r sd_conflict-sol, echo = FALSE, eval=FALSE}
+sd(df_opposition$conflict_p) %>% round(2)*100
+```
+
+```{r sd_conflict, exercise = TRUE}
+
+```
+
+```{r sd_conflict_q, echo = FALSE}
+question_text(
+  "The standard deviation of the conflict measure (in percent and rounded to two meaningful digits) is:",
+  answer("0.27", correct = F, message = "Close, but you were asked to report the result in percent."),
+  answer("27", correct = T),
+  allow_retry = TRUE
+)
+```
+
+
+Let's find out whether larger opposition parties oppose the government more often than smaller ones. As a proxy for party size we are taking its seat share stored in the variable `seatshare`. Before we run the regression analysis, we should know how the variable looks like.
+
+* **Have a look at the variable using a histogram.**
+* **Make the plot look nicer by using the `theme_minimal`.**
+
+*(Note: This task is only meant to help you familiarize yourself with the data but won't count to your final exercise score.)*
+
+```{r histogram, exercise = TRUE}
+
+```
+
+```{r histogram-solution}
+ggplot(df_opposition, aes(seatshare)) + 
+  geom_histogram() + 
+  theme_minimal() 
+```
+ 
+```{r histogram-code-check}
+grade_code()
+```
+
+Now that you got a first visual glimpse at the explanatory variable, let's learn about some summary statistics.
+
+**What is the average value of `seatshare` in the data (in percent and rounded to two non-zero digits)?**
+
+```{r avg_seatshare-sol, eval=FALSE, echo = FALSE}
+mean(df_opposition$seatshare) %>% round(2)*100
+```
+
+```{r avg_seatshare, exercise = TRUE}
+
+```
+
+```{r avg_seatshare_q, echo = FALSE}
+question_text(
+  "The average value of `seatshare` (in percent and rounded to two meaningful digits) is:",
+  answer("12", correct = T),
+  allow_retry = T
+  )
+```
+
+**What is the maximum of `seatshare` (in percent and rounded to two meaningful digits)?**
+
+```{r max_seatshare_sol, echo = FALSE, eval=FALSE}
+max(df_opposition$seatshare) %>% round(2)*100
+```
+
+
+```{r max_seatshare, exercise = TRUE}
+
+```
+
+
+```{r max_seatshare_q, echo = FALSE}
+question_text(
+  "The maximum seat share of an opposition party in the data (in percent and rounded to two meaningful digits) is:",
+  answer("41", correct = T),
+  allow_retry = T
+  )
+```
+
+## Bivariate regression
+
+Time to run the regression. Regress the average opposition measure (`conflict_p`) on a party's seat share (`seatshare`) using the data set `df_opposition`.
+
+```{r lm_1_sol, eval=FALSE, echo = FALSE}
+lm(conflict_p ~ seatshare, data = df_opposition)
+```
+
+```{r lm_1, exercise = TRUE}
+
+```
+
+Please provide an interpretation of the estimated regression coefficient. 
+
+*Note that more than one answer can be correct.*
+
+```{r qlm_1_q, echo = FALSE}
+question("What does the coefficient estimate tell us about the relationship between seat share and the share of opposing votes to the government?",
+  answer("A one unit increase in seat share is associated with an increase of about 56% in votes against the government.", correct = F, message = "Keep in mind that reporting increases in percent is a relative measure. However, the dependent variable is measured in percentage points."),
+    answer("A one unit increase in seat share causes an increase in votes against the government of about 56 percentage points.", correct = F, message = "This would only hold if you assume that there are no confounders, i.e. no unobserved factors that affect both the size of a party in parliament and its behavior vis-a-vis the government. Without randomization or further control variables, this seems not realistic to hold in practice."),
+  answer("An increase of one percentage point in vote share is associated with a an increase of about 0.56 percentage points in the the share of votes against the government.", correct = T),
+    answer("We expected an increase of about 56 percentage points in the share of votes against the government when the seat share variable increases by one unit.", correct = T),
+  random_answer_order = TRUE,
+  allow_retry = T
+)
+
+```
+
+### Predicted values
+
+Not only does the model help us understand how much the share of votes against the government is expected to change when party size increases, but it also allows us to make predictions. 
+
+**According to our model, how often do parties with a seat share of 30% oppose the government on average? Please provide the answer in percent with two significant (non-zero) digits.**
+
+*(Hint: If you stored the regression output in a separate object in the previous task, you are able to access the object here. Alternatively, you can also re-run the regression in this chunk.)*
+
+```{r predict_sol, eval = F, echo = F}
+m1 <- lm(conflict_p ~ seatshare, data = df_opposition)
+
+predict(m1, newdata = tibble(seatshare = .3)) %>% round(2)*100
+```
+
+```{r predict, exercise=TRUE, exercise.setup = "lm_1"}
+
+```
+
+```{r predict_q, echo = FALSE}
+question_text(
+  "Parties with a seat share of 30% oppose the government on average in __ percent of votes.",
+  answer("66", correct = T),
+  answer("65.61", correct = F, message = "That is too detailed."),
+  answer("0.66", correct = F, message = "Please provide the answer in percent."),
+  allow_retry = T
+)
+```
+
+### Model assumptions
+
+As always, it's important to keep in mind what we are assuming the models that we run on our data to **infer** what is going on in the real world.
+
+```{r assumptions_q1, echo = FALSE}
+question("Which key assumption is required to interpret the relationship from a linear model as causal?",
+  answer("Unobserved factors have an average of zero and do not depend on the explanatory variable.", correct = T),
+  answer("The parameters are linear."),
+  answer("There is a correlation between the dependent and independent variables."),
+  answer("There is no measurement error in the dependent variable."),
+  random_answer_order = TRUE,
+  allow_retry = T,
+  incorrect = "Hint: Have a look at the slides and think about the error."
+)
+
+```
+
+
+## Submit
+
+```{r context="server"}
+learnrhash::encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(default_ui(url = "https://ilias.uni-mannheim.de/ilias.php?baseClass=ilObjSurveyGUI&ref_id=1094762&cmd=infoScreen
+"))
+```
+
+
+
