@@ -1,0 +1,221 @@
+---
+title: "LearnR Exercises - Week 11 - Interaction Models"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(learnrhash)
+gradethis::gradethis_setup()
+
+library(tidyverse)
+library(broom)
+library(texreg)
+library(margins)
+data(df_opposition) 
+```
+
+## Modeling interaction effects
+
+You will continue working with the data on opposition party behavior in European national parliaments by Tuttnauer (2018). This week, you are asked to reproduce some of the results from the paper with a focus on modeling and interpreting interaction effects. 
+
+Please start with reproducing model 6 from page 290 in Tuttnauer (2018). In addition to the variables that we used in last week's take-home tutorial, the model includes an interaction of `seatshare` and government experience, (`ge`). The dependent variable is, as in previous weeks, `conflict_p`. Moreover, the model controls for the frequency of recorded votes (`frequency`), whether or not an opposition is on the ideological side of the government (`govside`), and the ideological range of the government coalition (`govrange`). 
+
+Don't forget to include the other control variables from last week:
+
+
+* `abs_lrdiff`: Ideological distance from the government as the absolute difference between a party's left-right position and the size-weighted average position of the government coalition.
+* `ge`:  Government-experience value that ranges between 0 if the party has always been in opposition and 1 if the party has always been in government.
+* `inst_power`:  Institutional power of the opposition measuring the strength of the committee system on a scale from 0 to 7.
+* `y_openness`: Average number of distinct government compositions in the past 10 years.
+* `importance`: Index ranging between 0 (low-importance parliament) and 1 (high-importance parliament).
+* `govtype_mod`: A dummy (=1) for surplus coalitions, in contrast with minimal-winning ones (=0).
+* `record_threshold`:The percentage of MPs needed to call for a recorded vote (ranging between 0 and 0.3).
+
+**Please specify model 6 from Tuttnauer (2018) and report the coefficient for party size. Round to two digits after the comma.**
+
+```{r lm_1_sol, eval=FALSE, echo = FALSE}
+model <- lm(conflict_p ~ abs_lrdiff + seatshare*ge + govside + inst_power + 
+                  y_openness + importance + govrange + govtype_mod + record_threshold + frequency,
+                data = df_opposition)
+
+model %>% tidy() %>% filter(term == "seatshare")
+```
+
+```{r lm_1, exercise = TRUE}
+
+```
+
+```{r lm_1_q, echo = FALSE}
+question_text("Enter the value of the coefficient for seat share:",
+  answer("1.92", correct = T),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session. For example, the tidy function may be helpful to get the estimate. Also make sure that you included all variables in the model."
+)
+```
+
+### Interpreting interaction effects
+
+Interpreting interaction effects can be tricky. As discussed in class, there are two main approaches: We can look at the marginal effect of a variable conditional on values of the moderating variable (as Tuttnauer did in Figure 2 in his paper) or we can calculate predicted values to generate meaningful quantities of interest. 
+
+### Marginal effects
+
+**What is the marginal effect of the government experience variable when party size it at its minimum in comparison to when  party size is at its maximum (as well as the corresponding 95% confidence interval for the marginal effect estimates)?**
+
+*Hint: The `margins` package may be very useful for this exercise*
+
+```{r margins_sol, echo = FALSE, eval = FALSE}
+model <- lm(conflict_p ~ abs_lrdiff + seatshare*ge + govside + inst_power + 
+                  y_openness + importance + govrange + govtype_mod + record_threshold + frequency,
+                data = df_opposition)
+
+mar <- model %>%
+  margins(
+    # marginal effect of which variable:
+    variables = "ge",
+    # conditional on which values:
+    at = list(seatshare = c(min(df_opposition$seatshare), max(df_opposition$seatshare)))
+  ) 
+
+# store the marginal effects as data frame/tibble
+summary(mar) %>% as_tibble() 
+
+```
+
+```{r margins, exercise = TRUE, exercise.setup = "lm_1"}
+
+```
+
+
+```{r margeff_min, echo = FALSE}
+question_text("Enter the value of the (average) marginal effect of government experience when party size is at its minimum here (rounded to two digits after the decimal):",
+  answer("0.38", correct = T),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the margins() function."
+)
+```
+
+```{r margeff_max, echo = FALSE}
+question_text("Enter the value of the (average) marginal effect of government experience when party size is at its maximum here (rounded to two digits after the decimal):",
+  answer("-9.12", correct = T),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the margins() function."
+)
+```
+
+```{r margeff_low, echo = FALSE}
+question_text("Enter the value of the lower bound of the 95% confidence interval of the marginal effect of government experience when party size is at its minimum (rounded to two digits after the decimal):",
+  answer("0.06", correct = T),
+  answer("-1.56", correct = F, message = "Make sure you report the result for the marginal effect when seat share is at its minimum."),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the margins() function."
+)
+```
+
+```{r margeff_high, echo = FALSE}
+question_text("Enter the value of the upper bound of the 95% confidence interval of the marginal effect of government experience when party size is at its maximum (rounded to two digits after the decimal):",
+  answer("-0.27", correct = T),
+  answer("0.70", correct = F, message = "Make sure you report the result for the marginal effect when seat share is at its maximum."),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the margins() function."
+)
+```
+
+**So what do we learn from the marginal effect estimation?**
+
+*Note that more than one answer can be correct.*
+
+```{r margeff_interpret, echo = FALSE}
+question("The estimate of government experience...",
+  answer("is positive and statistically significant at the 95% confidence level when party size is at its minimum.", correct = T),
+  answer("is negative and statistically significant at the 95% confidence level when party size is at its maximum.", correct = T),
+  answer("does not turn statistically significant at the 95% confidence level."),
+  answer("is statistically independent of party size."),
+  random_answer_order = TRUE,
+  allow_retry = T
+)
+```
+
+### Predicted values
+
+Estimating and reporting marginal effects is very common but can become complex, in particular, when we are faced with non-linear models. Therefore, it is often recommendable to calculate meaningful predicted values for the quantities of interest. Most of the times (and also in this case), researchers report predictions for the mean response (expected value) and not for future events. It allows them to ignore fundamental model uncertainty.
+
+**What is the predicted (expected) average opposition share when government experience is equal to one and party size it at its minimum in comparison to when party size is at its maximum, holding everything else at the respective mean/median. Please also calculate the corresponding 95% prediction interval.**
+
+*Hint: The `predict` function may be very useful for this exercise*
+
+```{r predict_sol, echo = FALSE, eval = FALSE}
+model <- lm(conflict_p ~ abs_lrdiff + seatshare*ge + govside + inst_power + 
+                  y_openness + importance + govrange + govtype_mod + record_threshold + frequency,
+                data = df_opposition)
+
+df_scenario <- tibble(
+   seatshare = c(min(df_opposition$seatshare), max(df_opposition$seatshare))
+  , ge = 1
+  , abs_lrdiff = mean(df_opposition$abs_lrdiff)
+  , govrange = mean(df_opposition$govrange)
+  , govside = median(df_opposition$govside)
+  , inst_power = mean(df_opposition$inst_power)
+  , y_openness = mean(df_opposition$y_openness)
+  , importance = mean(df_opposition$importance)
+  , govtype_mod = median(df_opposition$govtype_mod)
+  , record_threshold = mean(df_opposition$record_threshold)
+  , frequency = mean(df_opposition$frequency)
+)
+
+predict(model, newdata = df_scenario, interval = "confidence") %>% round(2)*100
+
+```
+
+```{r predict, exercise = TRUE, exercise.setup = "lm_1"}
+
+```
+
+
+```{r predict_min, echo = FALSE}
+question_text("Enter the value of the predicted average opposition share when government experience is equal to one and party size is at its minimum (rounded to two meaningful digits):",
+  answer("67", correct = T),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the predict() function."
+)
+```
+
+```{r predict_max, echo = FALSE}
+question_text("Enter the value of the predicted average opposition share when government experience is equal to one and party size is at its maximum (rounded to two meaningful digits):",
+  answer("15", correct = T),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the predict() function."
+)
+```
+
+```{r predict_low, echo = FALSE}
+question_text("Enter the value of the lower bound of the 95% prediction interval when government experience is equal to one and party size is at its minimum (rounded to two meaningful digits):",
+  answer("41", correct = T),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the predict() function."
+)
+```
+
+```{r predict_high, echo = FALSE}
+question_text("Enter the value of the upper bound of the 95% prediction interval when government experience is equal to one and party size is at its maximum (rounded to two meaningful digits):",
+  answer("55", correct = T),
+  allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the margins() function."
+)
+```
+
+**So what do we learn from the predictions?**
+
+*Note that more than one answer can be correct.*
+
+```{r predict_interpret, echo = FALSE}
+question("The predicted average value for votes against the government (in percent)...",
+  answer("is unlikely to differ for opposition parties with maximum government experience conditional on their party size.", correct = T),
+  answer("is likely to differ for opposition parties with maximum government experience conditional on their party size.", correct = F),
+  random_answer_order = TRUE,
+  allow_retry = T
+)
+```
+
+## Submit
+
+```{r context="server"}
+learnrhash::encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(default_ui(url = "https://ilias.uni-mannheim.de/ilias.php?baseClass=ilObjSurveyGUI&ref_id=1096025&cmd=infoScreen"))
+```
+
