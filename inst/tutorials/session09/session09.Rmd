@@ -17,7 +17,7 @@ data(df_opposition)
 
 ## Warm-Up
 
-Before we start running regressions with multiple explanatory variables, let's recap why we might want to do this in the first place. As discussed in class, one of the main reasons for multiple regression is to address the issue of omitted variable bias. It implies that we systematically miss the true parameter in the population model when we run our statistical model. 
+Before we start running regressions with multiple explanatory variables, let's recap why we might want to do this in the first place. As discussed in class, one of the main reasons for multiple regression is to address concerns about omitted variable bias. If present, it implies that we systematically miss the true parameter in the population model when we run our statistical model. 
 
 **Choose the correct statement:**
 
@@ -89,11 +89,11 @@ question_text("Enter the number of countries with an average opposition score ab
 
 ## Multiple Regression
 
-Last week, we found that size of a party (`seatshare`) is associated with an increase in how often a party votes against the government. However, over the course of this week, you couldn't stop thinking about it and started fearing that there may be unobserved factors that confound the relationship both at the party level as well as at the system level. 
+Last week, we found that size of a party (`seatshare`) is associated with an increase in how often a party votes against the government. However, over the course of this week, you couldn't stop thinking about it and started fearing that there may be unobserved factors that confound the relationship between the two variables of interest both at the party level as well as at the system level. 
 
-Specifically, one might expect that larger parties are on average be ideologically closer to government parties than smaller (fringe) parties. Moreover, it is possible that larger parties have more government experience and are, therefore, likely to behave differently vis-a-vis the government than smaller parties. 
+Specifically, one might expect that larger parties are on average ideologically closer to government parties than smaller (fringe) parties. Moreover, it is possible that larger parties have more government experience and are, therefore, likely to behave differently vis-a-vis the government than smaller parties. 
 
-In addition, there may be party-system specific factors varying between countries that affect how party size and opposition to the government are related in our data. For example, the degree to which institutional arrangements allow opposition parties to influence decision-making, the general openness of the competition structure of a party system, the general importance of the parliament for policy-making, the type of government the opposition parties is facing, as well as how high the threshold is to record voting behavior may be theoretically plausible factors that affect the relationship between party size and opposition behavior.
+In addition, there may be party-system specific factors varying between countries that affect how party size and opposition to the government are related in our data. For example, the degree to which institutional arrangements allow opposition parties to influence decision-making, the general openness of the competition structure of a party system, the overall importance of the parliament for policy-making, the type of government the opposition parties are facing, as well as how high the threshold is to record voting behavior may be theoretically plausible factors that affect the relationship between party size and opposition behavior.
 
 Luckily, the data set by Tuttnauer (2018) includes variables that measure these potential confounders:
 
@@ -171,7 +171,8 @@ question_text(
 
 ### Categorical/dummy variables
 
-Usually, we should be very carefully interpreting control variables by themselves, at least if we didn't spent much time thinking about potential confounders affecting the relationship between this particular control variable and the outcome of interest. 
+Usually, we should be very carefully interpreting control variables by themselves, at least if we didn't spent much time thinking about potential confounders affecting the relationship between a particular control variable and the outcome of interest. For more details on this topic, check out the overview essay, "The Causal Interpretation of Estimated Associations in Regression Models", by Keele et al. (2019) which is available here: https://doi.org/10.1017/psrm.2019.31
+
 
 **In this case, however, you are required to make an exception and provide an interpretation of the estimate for `govtype_mod` from the regression model that you ran above.**
 
@@ -182,9 +183,8 @@ Usually, we should be very carefully interpreting control variables by themselve
 ```
 
 ```{r qlm_1_q, echo = FALSE}
-question("What do regression estimates tell us about the relationship between government types (`govtype_mod`) and the share of opposing votes to the government?",
+question("What does the regression tell us about the relationship between government coalition types (`govtype_mod`) and the share of votes opposed to the government?",
   answer("A one unit increase in `govtype_mode` causes a decrease of about 0.04 percentage points in votes against the government, holding everthing else contant.", correct = F, message = "Be very careful to make causal statements when using regression analysis without a randomization strategy. Moreover, you are dealing with a dummy variable so it is recommendable to provide interpretations for the respective category values."),
-    answer("Surplus coalition governments face on average 0.04 percentage points more opposition than minimal-winning coalition governments, holding everthing else contant.", correct = T),
   answer("Opposition parties facing a surplus coalition government vote on average 0.04 percentage points more often against the government than opposition parties facing a minimal-winning coalition, holding everthing else contant.", correct = T),
   answer("Opposition parties facing a minimal-coalition government vote on average 0.04 percentage points more often against the government than opposition parties facing a surplus coalition government, holding everthing else contant.", correct = F, message = "Think about the reference category."),
   answer("Opposition parties facing a minimal-coalition government vote against the government in 83% of the votes on average, setting all other variables to zero.", correct = T),

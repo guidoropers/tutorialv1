@@ -17,7 +17,7 @@ data(df_opposition)
 
 ## Warm-Up
 
-Before we get our hands dirty with regression analysis, let's go over some of the key concepts discussed in this week's class.
+Before we get our hands dirty with statistical inference in regression analyses, let's go over some of the key concepts discussed in this week's class.
 
 ### Probability theory
 
@@ -204,7 +204,7 @@ model %>% tidy() %>%
 ```
 
 ```{r confint_low, echo = FALSE}
-question_text("Enter the value of the lower bound of the 95% confidence interval here (rounded to digits behind the decimal):",
+question_text("Enter the value of the lower bound of the 95% confidence interval here (rounded to two digits behind the decimal):",
   answer("-0.10", correct = T, message = "Correct. You chose to calculate the interval based on the normal distribution. Note that some researchers prefer to calculate it based on the t-distribution which makes them more conservative."),
   answer("-0.12", correct = T, message = "Correct. You chose to calculate the interval based on the t-distribution. Note that some researchers prefer to calculate it based on the normal distribution which makes them less conservative."),
     answer("-11.79", correct = F, message = "Close. Hint: Do not report the value in percent."),
@@ -214,7 +214,7 @@ question_text("Enter the value of the lower bound of the 95% confidence interval
 ```
 
 ```{r confint_high, echo = FALSE}
-question_text("Enter the value of the upper bound of the 95% confidence interval here (rounded to digits behind the decimal):",
+question_text("Enter the value of the upper bound of the 95% confidence interval here (rounded to two digits behind the decimal):",
   answer("1.24", correct = T, message = "Correct. You chose to calculate the interval based on the normal distribution. Note that some researchers prefer to calculate it based on the t-distribution which makes them more conservative."),
   answer("1.26", correct = T, message = "Correct. You chose to calculate the interval based on the t-distribution. Note that some researchers prefer to calculate it based on the normal distribution which makes them less conservative."),
     answer("124.49", correct = F, message = "Close. Hint: Do not report the value in percent."),

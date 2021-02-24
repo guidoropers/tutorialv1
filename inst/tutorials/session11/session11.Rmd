@@ -26,14 +26,13 @@ Don't forget to include the other control variables from last week:
 
 
 * `abs_lrdiff`: Ideological distance from the government as the absolute difference between a party's left-right position and the size-weighted average position of the government coalition.
-* `ge`:  Government-experience value that ranges between 0 if the party has always been in opposition and 1 if the party has always been in government.
 * `inst_power`:  Institutional power of the opposition measuring the strength of the committee system on a scale from 0 to 7.
 * `y_openness`: Average number of distinct government compositions in the past 10 years.
 * `importance`: Index ranging between 0 (low-importance parliament) and 1 (high-importance parliament).
 * `govtype_mod`: A dummy (=1) for surplus coalitions, in contrast with minimal-winning ones (=0).
 * `record_threshold`:The percentage of MPs needed to call for a recorded vote (ranging between 0 and 0.3).
 
-**Please specify model 6 from Tuttnauer (2018) and report the coefficient for party size. Round to two digits after the comma.**
+**Please specify model 6 from Tuttnauer (2018) and report the coefficient for party size. Round to two digits after the decimal.**
 
 ```{r lm_1_sol, eval=FALSE, echo = FALSE}
 model <- lm(conflict_p ~ abs_lrdiff + seatshare*ge + govside + inst_power + 
@@ -134,9 +133,9 @@ question("The estimate of government experience...",
 
 ### Predicted values
 
-Estimating and reporting marginal effects is very common but can become complex, in particular, when we are faced with non-linear models. Therefore, it is often recommendable to calculate meaningful predicted values for the quantities of interest. Most of the times (and also in this case), researchers report predictions for the mean response (expected value) and not for future events. It allows them to ignore fundamental model uncertainty.
+Estimating and reporting marginal effects is very common but can become complex, in particular, when we are dealing with non-linear regression models. Therefore, it is often recommendable to calculate meaningful predicted values for some quantities of interest. Most of the times (and also in this case), researchers report predictions for the mean response (expected value) and not for future events. It allows them to ignore fundamental model uncertainty.
 
-**What is the predicted (expected) average opposition share when government experience is equal to one and party size it at its minimum in comparison to when party size is at its maximum, holding everything else at the respective mean/median. Please also calculate the corresponding 95% prediction interval.**
+**What is the predicted (expected) average opposition share (in percent) when government experience is equal to one and party size it at its minimum in comparison to when party size is at its maximum, holding everything else at the respective mean/median. Please also calculate the corresponding 95% prediction intervals.**
 
 *Hint: The `predict` function may be very useful for this exercise*
 
@@ -169,28 +168,28 @@ predict(model, newdata = df_scenario, interval = "confidence") %>% round(2)*100
 
 
 ```{r predict_min, echo = FALSE}
-question_text("Enter the value of the predicted average opposition share when government experience is equal to one and party size is at its minimum (rounded to two meaningful digits):",
+question_text("Enter the value of the predicted average opposition share  (in percent) when government experience is equal to one and party size is at its minimum (rounded to two meaningful digits):",
   answer("67", correct = T),
   allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the predict() function."
 )
 ```
 
 ```{r predict_max, echo = FALSE}
-question_text("Enter the value of the predicted average opposition share when government experience is equal to one and party size is at its maximum (rounded to two meaningful digits):",
+question_text("Enter the value of the predicted average opposition share (in percent)  when government experience is equal to one and party size is at its maximum (rounded to two meaningful digits):",
   answer("15", correct = T),
   allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the predict() function."
 )
 ```
 
 ```{r predict_low, echo = FALSE}
-question_text("Enter the value of the lower bound of the 95% prediction interval when government experience is equal to one and party size is at its minimum (rounded to two meaningful digits):",
+question_text("Enter the value of the lower bound of the 95% prediction interval(in percent) when government experience is equal to one and party size is at its minimum (rounded to two meaningful digits):",
   answer("41", correct = T),
   allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the predict() function."
 )
 ```
 
 ```{r predict_high, echo = FALSE}
-question_text("Enter the value of the upper bound of the 95% prediction interval when government experience is equal to one and party size is at its maximum (rounded to two meaningful digits):",
+question_text("Enter the value of the upper bound of the 95% prediction interval (in percent) when government experience is equal to one and party size is at its maximum (rounded to two meaningful digits):",
   answer("55", correct = T),
   allow_retry = T, incorrect = "Hint: Revisit the code from the lab-session, in particular, the margins() function."
 )
